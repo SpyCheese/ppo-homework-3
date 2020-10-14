@@ -4,18 +4,13 @@ import org.jetbrains.annotations.NotNull;
 import ru.akirakozov.sd.refactoring.dao.Product;
 import ru.akirakozov.sd.refactoring.dao.ProductDao;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Statement;
+import java.io.PrintWriter;
 
 /**
  * @author akirakozov
  */
-public class AddProductServlet extends HttpServlet {
+public class AddProductServlet extends ServletBase {
     private final @NotNull ProductDao productDao;
 
     public AddProductServlet(@NotNull ProductDao productDao) {
@@ -23,12 +18,10 @@ public class AddProductServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void processRequest(@NotNull HttpServletRequest request, @NotNull PrintWriter writer) {
         String name = request.getParameter("name");
         long price = Long.parseLong(request.getParameter("price"));
         productDao.addProduct(new Product(name, price));
-        response.setContentType("text/html");
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().println("OK");
+        writer.println("OK");
     }
 }
