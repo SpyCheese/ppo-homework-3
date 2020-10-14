@@ -3,6 +3,7 @@ package ru.akirakozov.sd.refactoring.servlet;
 import org.jetbrains.annotations.NotNull;
 import ru.akirakozov.sd.refactoring.dao.Product;
 import ru.akirakozov.sd.refactoring.dao.ProductDao;
+import ru.akirakozov.sd.refactoring.util.HttpUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.PrintWriter;
@@ -20,7 +21,7 @@ public class GetProductsServlet extends ServletBase {
     @Override
     protected void processRequest(@NotNull HttpServletRequest request, @NotNull PrintWriter writer) {
         for (Product product : productDao.getProducts()) {
-            writer.println(product.getName() + "\t" + product.getPrice() + "</br>");
+            HttpUtil.writeProduct(writer, product);
         }
     }
 }

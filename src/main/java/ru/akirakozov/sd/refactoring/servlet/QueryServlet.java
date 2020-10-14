@@ -3,6 +3,7 @@ package ru.akirakozov.sd.refactoring.servlet;
 import org.jetbrains.annotations.NotNull;
 import ru.akirakozov.sd.refactoring.dao.Product;
 import ru.akirakozov.sd.refactoring.dao.ProductDao;
+import ru.akirakozov.sd.refactoring.util.HttpUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.PrintWriter;
@@ -21,26 +22,34 @@ public class QueryServlet extends ServletBase {
     protected void processRequest(@NotNull HttpServletRequest request, @NotNull PrintWriter writer) {
         String command = request.getParameter("command");
 
-        if ("max".equals(command)) {
-            writer.println("<h1>Product with max price: </h1>");
-            Product product = productDao.getProductWithMaxPrice();
-            if (product != null) {
-                writer.println(product.getName() + "\t" + product.getPrice() + "</br>");
+        switch (command) {
+            case "max": {
+                HttpUtil.writeHeader(writer, "Product with max price: ");
+                Product product = productDao.getProductWithMaxPrice();
+                if (product != null) {
+                    HttpUtil.writeProduct(writer, product);
+                }
+                break;
             }
-        } else if ("min".equals(command)) {
-            writer.println("<h1>Product with min price: </h1>");
-            Product product = productDao.getProductWithMinPrice();
-            if (product != null) {
-                writer.println(product.getName() + "\t" + product.getPrice() + "</br>");
+            case "min": {
+                HttpUtil.writeHeader(writer, "Product with min price: ");
+                Product product = productDao.getProductWithMinPrice();
+                if (product != null) {
+                    HttpUtil.writeProduct(writer, product);
+                }
+                break;
             }
-        } else if ("sum".equals(command)) {
-            writer.println("Summary price: ");
-            writer.println(productDao.getSummaryPrice());
-        } else if ("count".equals(command)) {
-            writer.println("Number of products: ");
-            writer.println(productDao.getProductCount());
-        } else {
-            writer.println("Unknown command: " + command);
+            case "sum":
+                writer.println("Summary price: ");
+                writer.println(productDao.getSummaryPrice());
+                break;
+            case "count":
+                writer.println("Number of products: ");
+                writer.println(productDao.getProductCount());
+                break;
+            default:
+                writer.println("Unknown command: " + command);
+                break;
         }
     }
 }
