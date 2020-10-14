@@ -1,6 +1,7 @@
 package ru.akirakozov.sd.refactoring.util;
 
 import org.jetbrains.annotations.NotNull;
+import ru.akirakozov.sd.refactoring.dao.Product;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -8,7 +9,7 @@ import java.util.List;
 
 public class DbTestUtil {
     public static void initTestDb(@NotNull List<Product> products) throws SQLException {
-        try (Connection c = DriverManager.getConnection("jdbc:sqlite:test.db")) {
+        try (Connection c = DriverManager.getConnection(TEST_DB_URL)) {
             Statement stmt = c.createStatement();
             String sql =
                     "DROP TABLE IF EXISTS PRODUCT;" +
@@ -21,7 +22,7 @@ public class DbTestUtil {
             for (Product product : products) {
                 PreparedStatement prep = c.prepareStatement("INSERT INTO PRODUCT (NAME, PRICE) VALUES (?, ?);");
                 prep.setString(1, product.getName());
-                prep.setInt(2, product.getPrice());
+                prep.setLong(2, product.getPrice());
                 prep.executeUpdate();
                 prep.close();
             }
@@ -29,7 +30,7 @@ public class DbTestUtil {
     }
 
     public static @NotNull List<Product> getProductsFromTestDb() throws SQLException {
-        try (Connection c = DriverManager.getConnection("jdbc:sqlite:test.db")) {
+        try (Connection c = DriverManager.getConnection(TEST_DB_URL)) {
             Statement stmt = c.createStatement();
             String sql = "SELECT NAME, PRICE FROM PRODUCT;";
             ResultSet rs = stmt.executeQuery(sql);
@@ -42,4 +43,6 @@ public class DbTestUtil {
             return products;
         }
     }
+
+    public static final @NotNull String TEST_DB_URL = "jdbc:sqlite:unittest.db";
 }

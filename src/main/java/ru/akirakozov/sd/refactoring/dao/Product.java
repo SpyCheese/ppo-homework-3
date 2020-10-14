@@ -1,4 +1,4 @@
-package ru.akirakozov.sd.refactoring.util;
+package ru.akirakozov.sd.refactoring.dao;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -7,9 +7,9 @@ import java.util.Objects;
 public class Product {
     @NotNull
     private final String name;
-    private final int price;
+    private final long price;
 
-    public Product(@NotNull String name, int price) {
+    public Product(@NotNull String name, long price) {
         this.name = name;
         this.price = price;
     }
@@ -18,7 +18,7 @@ public class Product {
         return name;
     }
 
-    public int getPrice() {
+    public long getPrice() {
         return price;
     }
 

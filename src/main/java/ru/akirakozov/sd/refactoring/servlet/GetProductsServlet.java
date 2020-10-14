@@ -1,5 +1,9 @@
 package ru.akirakozov.sd.refactoring.servlet;
 
+import org.jetbrains.annotations.NotNull;
+import ru.akirakozov.sd.refactoring.dao.Product;
+import ru.akirakozov.sd.refactoring.dao.ProductDao;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,29 +17,19 @@ import java.sql.Statement;
  * @author akirakozov
  */
 public class GetProductsServlet extends HttpServlet {
+    private final @NotNull ProductDao productDao;
+
+    public GetProductsServlet(@NotNull ProductDao productDao) {
+        this.productDao = productDao;
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try {
-            try (Connection c = DriverManager.getConnection("jdbc:sqlite:test.db")) {
-                Statement stmt = c.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT * FROM PRODUCT");
-                response.getWriter().println("<html><body>");
-
-                while (rs.next()) {
-                    String  name = rs.getString("name");
-                    int price  = rs.getInt("price");
-                    response.getWriter().println(name + "\t" + price + "</br>");
-                }
-                response.getWriter().println("</body></html>");
-
-                rs.close();
-                stmt.close();
-            }
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        response.getWriter().println("<html><body>");
+        for (Product product : productDao.getProducts()) {
+            response.getWriter().println(product.getName() + "\t" + product.getPrice() + "</br>");
         }
+        response.getWriter().println("</body></html>");
 
         response.setContentType("text/html");
         response.setStatus(HttpServletResponse.SC_OK);

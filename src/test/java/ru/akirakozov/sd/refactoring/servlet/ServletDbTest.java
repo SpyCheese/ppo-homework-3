@@ -4,8 +4,10 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.akirakozov.sd.refactoring.dao.ProductDao;
+import ru.akirakozov.sd.refactoring.dao.SqliteProductDao;
 import ru.akirakozov.sd.refactoring.util.DbTestUtil;
-import ru.akirakozov.sd.refactoring.util.Product;
+import ru.akirakozov.sd.refactoring.dao.Product;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,6 +26,7 @@ import static org.mockito.Mockito.*;
 class ServletDbTest {
     StringWriter writer;
     HttpServletResponse response;
+    ProductDao productDao;
 
     @BeforeEach
     void before() throws Exception {
@@ -39,11 +42,12 @@ class ServletDbTest {
                 new Product("Banana", 65),
                 new Product("Cucumber", 35)
         ));
+        productDao = new SqliteProductDao(DbTestUtil.TEST_DB_URL);
     }
 
     @Test
     void testGetProducts() throws Exception {
-        new GetProductsServlet().doGet(createRequest(Collections.emptyMap()), response);
+        new GetProductsServlet(productDao).doGet(createRequest(Collections.emptyMap()), response);
         String result = writer.getBuffer().toString();
         Assertions.assertTrue(result.contains("Apple\t10"));
         Assertions.assertTrue(result.contains("Banana\t65"));
@@ -52,7 +56,7 @@ class ServletDbTest {
 
     @Test
     void testAddProducts() throws Exception {
-        new AddProductServlet().doGet(createRequest(Map.of(
+        new AddProductServlet(productDao).doGet(createRequest(Map.of(
                 "name", "Orange",
                 "price",  "33"
         )), response);
@@ -68,7 +72,7 @@ class ServletDbTest {
     }
 
     void testQuery(@NotNull String command, @NotNull String expected) throws IOException {
-        new QueryServlet().doGet(createRequest(Map.of("command", command)), response);
+        new QueryServlet(productDao).doGet(createRequest(Map.of("command", command)), response);
         String result = writer.getBuffer().toString();
         Assertions.assertTrue(Pattern.compile(expected, Pattern.DOTALL).matcher(result).find(), "Output: " + result);
     }
